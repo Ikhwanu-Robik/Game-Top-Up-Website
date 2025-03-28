@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 
 class TopUpTransactionsController extends Controller
 {
@@ -101,21 +102,23 @@ class TopUpTransactionsController extends Controller
     {
         $transactions = null;
 
-        if (Cache::has('transaction_history')) {
-            $transactions = json_decode(Cache::get('transaction_history'));
+        if (Cache::has('transaction_history_' . Auth::id())) {
+            $transactions = json_decode(Crypt::decryptString(Cache::get('transaction_history_' . Auth::id())));
         } else {
             $transactions = TopUpTransactionsController::getReport();
 
             $json_packages = json_encode($transactions);
-            Cache::put('transaction_history', $json_packages, now()->addMinutes(10));
+            $enc_json_packages = Crypt::encryptString($json_packages);
+            Cache::put('transaction_history_' . Auth::id(), $enc_json_packages, now()->addMinutes(10));
         }
 
         return view('report', ['transactions' => $transactions]);
     }
 
     function refreshCache() {
-        Cache::forget('transaction_history');
+        Cache::forget('transaction_history_' . Auth::id());
         $json_packages = json_encode(TopUpTransactionsController::getReport());
-        Cache::put('transaction_history', $json_packages, now()->addMinutes(10));
+        $enc_json_packages = Crypt::encryptString($json_packages);
+        Cache::put('transaction_history_' . Auth::id(), $enc_json_packages, now()->addMinutes(10));
     }
 }
