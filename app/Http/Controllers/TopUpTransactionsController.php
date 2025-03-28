@@ -9,6 +9,7 @@ use App\Models\TopUpTransaction;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class TopUpTransactionsController extends Controller
 {
@@ -48,23 +49,23 @@ class TopUpTransactionsController extends Controller
             'Authorization' => 'Basic ' . config('app.flip_api_key'),
             'Content-Type' => 'application/x-www-form-urlencoded',
         ])
-        ->asForm()  // Set the request content type to x-www-form-urlencoded
-        ->post('https://bigflip.id/big_sandbox_api/v2/pwf/bill', [
-            'title' => ($package->title . " - " . $package->items_count . " " . $game->currency),
-            'type' => 'SINGLE',
-            'amount' => $package->price,
-            'expired_date' => '',
-            'redirect_url' => config('app.url') . 'home',
-            'is_address_required' => '',
-            'is_phone_number_required' => '',
-            'step' => 1,
-            'sender_name' => '',
-            'sender_email' => '',
-            'sender_phone_number' => '',
-            'sender_address' => '',
-            'sender_bank' => '',
-            'sender_bank_type' => '',
-        ]);
+            ->asForm()  // Set the request content type to x-www-form-urlencoded
+            ->post('https://bigflip.id/big_sandbox_api/v2/pwf/bill', [
+                'title' => ($package->title . " - " . $package->items_count . " " . $game->currency),
+                'type' => 'SINGLE',
+                'amount' => $package->price,
+                'expired_date' => '',
+                'redirect_url' => config('app.url') . 'home',
+                'is_address_required' => '',
+                'is_phone_number_required' => '',
+                'step' => 1,
+                'sender_name' => '',
+                'sender_email' => '',
+                'sender_phone_number' => '',
+                'sender_address' => '',
+                'sender_bank' => '',
+                'sender_bank_type' => '',
+            ]);
 
         TopUpTransaction::create([
             'user_id' => $validated['user_id'],
@@ -78,7 +79,7 @@ class TopUpTransactionsController extends Controller
         return redirect()->away($protocol . $response['link_url']);
     }
 
-    function report() {
+    static private function getReport() {
         $transactions = TopUpTransaction::where('user_id', '=', Auth::id())->latest()->get();
 
         foreach ($transactions as $transaction) {
@@ -93,6 +94,28 @@ class TopUpTransactionsController extends Controller
             $transaction->status = ($transaction->status == 1) ? 'Success' : 'Pending';
         }
 
+        return $transactions;
+    }
+
+    function report()
+    {
+        $transactions = null;
+
+        if (Cache::has('transaction_history')) {
+            $transactions = json_decode(Cache::get('transaction_history'));
+        } else {
+            $transactions = TopUpTransactionsController::getReport();
+
+            $json_packages = json_encode($transactions);
+            Cache::put('transaction_history', $json_packages, now()->addMinutes(10));
+        }
+
         return view('report', ['transactions' => $transactions]);
+    }
+
+    function refreshCache() {
+        Cache::forget('transaction_history');
+        $json_packages = json_encode(TopUpTransactionsController::getReport());
+        Cache::put('transaction_history', $json_packages, now()->addMinutes(10));
     }
 }

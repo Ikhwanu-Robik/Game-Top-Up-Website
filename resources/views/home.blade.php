@@ -26,6 +26,9 @@
             <x-primary-button>
                 <a href="{{ route('home.refresh') }}">Refresh List</a>
             </x-primary-button>
+            <span class="text-gray-400">
+                *data berasal dari cache sehingga mungkin kurang update
+            </span>
 
             <x-input-error class="mt-2" :messages="$errors->get('user_id')" />
             <x-input-error class="mt-2" :messages="$errors->get('package_id')" />
@@ -52,8 +55,6 @@
                                         @endauth
 
                                         <input type="hidden" name="package_id" value="{{ $package->id }}">
-
-                                        {{-- <input type="hidden" name="link_url" value="https://{{ $package->link_url }}"> --}}
 
                                         <x-primary-button>
                                             Beli

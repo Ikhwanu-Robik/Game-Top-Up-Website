@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Cache;
 
 class TopUpPackagesController extends Controller
 {
-    private function callFlipApi()
+    static private function callFlipApi()
     {
         $packages = TopUpPackage::all();
         $games = Game::all();
