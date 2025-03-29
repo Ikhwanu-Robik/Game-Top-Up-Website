@@ -33,7 +33,7 @@ class TopUpPackagesController extends Controller
         return view('master.packages', ['packages' => $result_packages, 'games' => Game::all()]);
     }
 
-    function getBills()
+    static function getBills()
     {
         $result_packages = Cache::remember('top-up-packages', now()->addMinutes(10), function () {
             return json_encode(TopUpPackagesController::getPackagesData());
