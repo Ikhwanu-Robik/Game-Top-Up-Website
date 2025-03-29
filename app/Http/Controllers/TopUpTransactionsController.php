@@ -6,12 +6,10 @@ use App\Models\Game;
 use App\Models\TopUpPackage;
 use Illuminate\Http\Request;
 use App\Models\TopUpTransaction;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
-use Termwind\Components\BreakLine;
 
 class TopUpTransactionsController extends Controller
 {
@@ -47,6 +45,8 @@ class TopUpTransactionsController extends Controller
         $transactionRecord->status = $status;
 
         $transactionRecord->save();
+
+        Cache::flush();
 
         return response('Callback heard you');
     }
@@ -91,6 +91,8 @@ class TopUpTransactionsController extends Controller
             'flip_link_url' => $response['link_url']
         ]);
 
+        Cache::flush();
+
         $protocol = config('app.env' == 'production') ? 'https://' : 'http:///';
 
         return redirect()->away($protocol . $response['link_url']);
@@ -132,26 +134,16 @@ class TopUpTransactionsController extends Controller
 
     function report()
     {
-        $transactions = null;
-
-        if (Cache::has('transaction_history_' . Auth::id())) {
-            $transactions = json_decode(Crypt::decryptString(Cache::get('transaction_history_' . Auth::id())));
-        } else {
+        $transactions = Cache::remember('transaction_history_' . Auth::id(), now()->addMinutes(10), function () {
             $transactions = TopUpTransactionsController::getReport();
 
             $json_packages = json_encode($transactions);
             $enc_json_packages = Crypt::encryptString($json_packages);
-            Cache::put('transaction_history_' . Auth::id(), $enc_json_packages, now()->addMinutes(10));
-        }
+
+            return $enc_json_packages;
+        });
+        $transactions = json_decode(Crypt::decryptString($transactions));
 
         return view('report', ['transactions' => $transactions]);
-    }
-
-    function refreshCache()
-    {
-        Cache::forget('transaction_history_' . Auth::id());
-        $json_packages = json_encode(TopUpTransactionsController::getReport());
-        $enc_json_packages = Crypt::encryptString($json_packages);
-        Cache::put('transaction_history_' . Auth::id(), $enc_json_packages, now()->addMinutes(10));
     }
 }

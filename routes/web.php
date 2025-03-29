@@ -21,19 +21,7 @@ Route::get('/home', function () {
 Route::post('/flipcallback', [TopUpTransactionsController::class, 'flipCallback']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/home/refresh', function () {
-        $topUpPackage = new TopUpPackagesController();
-        $topUpPackage->refreshCache();
-        return redirect()->route('home');
-    })->name('home.refresh');
-
     Route::get('/report', [TopUpTransactionsController::class, 'report'])->name('report');
-
-    Route::get('/report/refresh', function () {
-        $topUpTransaction = new TopUpTransactionsController();
-        $topUpTransaction->refreshCache();
-        return redirect()->route('report');
-    })->name('report.refresh');
 
     Route::post('/transactions/store', [TopUpTransactionsController::class, 'saveTransaction'])->name('transactions.store');
 });

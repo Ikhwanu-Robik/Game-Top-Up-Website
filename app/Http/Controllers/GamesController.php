@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class GamesController extends Controller
 {
@@ -31,6 +32,8 @@ class GamesController extends Controller
             'icon' => $path_name,
             'currency' => $validated['currency']
         ]);
+
+        Cache::flush();
 
         return redirect()->route('master.games');
     }

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Cache;
 
 class TopUpPackagesController extends Controller
 {
-    static private function callFlipApi()
+    static private function getPackagesData()
     {
         $packages = TopUpPackage::all();
         $games = Game::all();
@@ -28,31 +28,19 @@ class TopUpPackagesController extends Controller
 
     function index()
     {
-        $result_packages = TopUpPackagesController::callFlipApi();
+        $result_packages = TopUpPackagesController::getPackagesData();
 
         return view('master.packages', ['packages' => $result_packages, 'games' => Game::all()]);
     }
 
     function getBills()
     {
-        $result_packages = null;
-        if (!Cache::has('top-up-packages')) {
-            $json_packages = json_encode(TopUpPackagesController::callFlipApi());
-            Cache::put('top-up-packages', $json_packages, now()->addMinutes(10));
-
-            $result_packages = json_decode(Cache::get('top-up-packages'));
-        }
-        else {
-            $result_packages = json_decode(Cache::get('top-up-packages'));
-        }
+        $result_packages = Cache::remember('top-up-packages', now()->addMinutes(10), function () {
+            return json_encode(TopUpPackagesController::getPackagesData());
+        });
+        $result_packages = json_decode($result_packages);
 
         return $result_packages;
-    }
-
-    function refreshCache() {
-        Cache::forget('top-up-packages');
-        $json_packages = json_encode(TopUpPackagesController::callFlipApi());
-        Cache::put('top-up-packages', $json_packages, now()->addMinutes(10));
     }
 
     function create()
@@ -76,6 +64,8 @@ class TopUpPackagesController extends Controller
             'items_count' => $validated['item'],
             'price' => $validated['price']
         ]);
+
+        Cache::flush();
 
         return redirect()->route('master.packages');
     }

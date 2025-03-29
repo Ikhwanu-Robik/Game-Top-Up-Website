@@ -8,12 +8,6 @@
     <div class="py-12">
 
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <x-primary-button class="m-2">
-                <a href="{{ route('report.refresh') }}">Refresh List</a>
-            </x-primary-button>
-            <span class="text-gray-400">
-                *data berasal dari cache sehingga mungkin kurang update
-            </span>
 
             <table class="border border-gray-400">
                 <tr class="[&>th]:pl-4 [&>th]:pr-4 [&>th]:border [&>th]:border-gray-400 bg-gray-400">
