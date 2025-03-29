@@ -39,20 +39,9 @@
                                     <span>IDR {{ $package->price }}</span>
                                     <span class="text-gray-500">{{ $package->items_count }}
                                         {{ $package->game_currency }}</span>
-                                    <form action="{{ route('transactions.store') }}" method="post">
-                                        @csrf
-                                        @auth
-                                            <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
-                                        @else
-                                            <input type="hidden" name="user_id" value="0">
-                                        @endauth
-
-                                        <input type="hidden" name="package_id" value="{{ $package->id }}">
-
-                                        <x-primary-button>
-                                            Beli
-                                        </x-primary-button>
-                                    </form>
+                                    <x-primary-button>
+                                        <a href="{{ route('transactions.create', ['package' => $package->id]) }}">Beli</a>
+                                    </x-primary-button>
                                 </x-top-up-package>
                             @endif
                         @endforeach

@@ -51,15 +51,26 @@ class TopUpTransactionsController extends Controller
         return response('Callback heard you');
     }
 
+    function createTransaction(Request $request) {
+        abort_if(!$request->query('package'), 400);
+
+        $package = TopUpPackage::find($request->query('package'));
+
+        return view('transaction', ['package' => $package]);
+    }
+
     function saveTransaction(Request $request)
     {
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'package_id' => 'required|exists:top_up_packages,id'
+            'package_id' => 'required|exists:top_up_packages,id',
+            'game_account_id' => 'required'
         ]);
 
         $package = TopUpPackage::find($validated['package_id']);
         $game = Game::find($package->game_id);
+
+        // GameController::sendItem($game->id, $validated['game_account_id']);
 
         // create a Flip bill with data from package
         $response = Http::withHeaders([

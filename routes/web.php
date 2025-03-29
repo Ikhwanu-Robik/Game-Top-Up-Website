@@ -14,6 +14,7 @@ Route::post('/flipcallback', [TopUpTransactionsController::class, 'flipCallback'
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/report', [TopUpTransactionsController::class, 'report'])->name('report');
+    Route::get('/transactions/create/', [TopUpTransactionsController::class, 'createTransaction'])->name('transactions.create');
     Route::post('/transactions/store', [TopUpTransactionsController::class, 'saveTransaction'])->name('transactions.store');
 });
 
