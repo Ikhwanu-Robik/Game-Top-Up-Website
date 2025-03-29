@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
+use Termwind\Components\BreakLine;
 
 class TopUpTransactionsController extends Controller
 {
@@ -26,10 +27,25 @@ class TopUpTransactionsController extends Controller
         }
 
         $data = json_decode($validated['data']);
-
         $transactionRecord = TopUpTransaction::where('flip_link_id', '=', $data->bill_link_id)->get()->get(0);
         $transactionRecord->method = $data->sender_bank;
-        $transactionRecord->status = 1;
+
+        $status = 0;
+        switch ($data->status) {
+            case 'SUCCESSFUL':
+                $status = 1;
+                break;
+            case 'CANCELLED':
+                $status = 2;
+                break;
+            case 'FAILED':
+                $status = 3;
+                break;
+            default:
+                $status = 4;
+        }
+        $transactionRecord->status = $status;
+
         $transactionRecord->save();
 
         return response('Callback heard you');
@@ -80,7 +96,8 @@ class TopUpTransactionsController extends Controller
         return redirect()->away($protocol . $response['link_url']);
     }
 
-    static private function getReport() {
+    static private function getReport()
+    {
         $transactions = TopUpTransaction::where('user_id', '=', Auth::id())->latest()->get();
 
         foreach ($transactions as $transaction) {
@@ -92,7 +109,22 @@ class TopUpTransactionsController extends Controller
             $transaction->package_items = $package->items_count;
             $transaction->game_name = $game->name;
 
-            $transaction->status = ($transaction->status == 1) ? 'Success' : 'Pending';
+            switch ($transaction->status) {
+                case 1:
+                    $transaction->status = 'SUCCESSFUL';
+                    break;
+                case 2:
+                    $transaction->status = 'CANCELLED';
+                    break;
+                case 3:
+                    $transaction->status = 'FAILED';
+                    break;
+                case 4:
+                    $transaction->status = 'UNKNOWN';
+                    break;
+                default:
+                    $transaction->status = 'PENDING';
+            }
         }
 
         return $transactions;
@@ -115,7 +147,8 @@ class TopUpTransactionsController extends Controller
         return view('report', ['transactions' => $transactions]);
     }
 
-    function refreshCache() {
+    function refreshCache()
+    {
         Cache::forget('transaction_history_' . Auth::id());
         $json_packages = json_encode(TopUpTransactionsController::getReport());
         $enc_json_packages = Crypt::encryptString($json_packages);
