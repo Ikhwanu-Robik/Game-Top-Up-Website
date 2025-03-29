@@ -6,6 +6,7 @@ use App\Models\Game;
 use App\Models\TopUpPackage;
 use Illuminate\Http\Request;
 use App\Models\TopUpTransaction;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
@@ -21,15 +22,23 @@ class TopUpTransactionsController extends Controller
         ]);
 
         if ($validated['token'] != config('app.flip_api_token')) {
-            return response('Forbidden', 403);
+            return abort(403);
         }
 
-        $data = json_decode($validated['data']);
-        $transactionRecord = TopUpTransaction::where('flip_link_id', '=', $data->bill_link_id)->get()->get(0);
-        $transactionRecord->method = $data->sender_bank;
+        $link_id = json_decode($validated['data'])->bill_link_id;
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . config('app.flip_api_key'),
+            'Accept' => 'application/json'
+        ])->get("https://bigflip.id/big_sandbox_api/v2/pwf/{$link_id}/payment");
+        if ($response->failed()) {
+            abort($response->getStatusCode());
+        }
+        $dataFromAPI = $response['data'][0];
+        $transactionRecord = TopUpTransaction::where('flip_link_id', '=', $link_id)->first();
+        $transactionRecord->method = $dataFromAPI['sender_bank'];
 
         $status = 0;
-        switch ($data->status) {
+        switch ($dataFromAPI['status']) {
             case 'SUCCESSFUL':
                 $status = 1;
                 break;
