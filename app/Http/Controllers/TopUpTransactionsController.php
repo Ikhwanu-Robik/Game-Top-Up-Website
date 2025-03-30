@@ -120,7 +120,7 @@ class TopUpTransactionsController extends Controller
 
     static private function getReport()
     {
-        $transactions = TopUpTransaction::where('user_id', '=', Auth::id())->latest()->get();
+        $transactions = TopUpTransaction::where('user_id', '=', Auth::id())->latest()->paginate(5);
 
         foreach ($transactions as $transaction) {
             $package = TopUpPackage::find($transaction->package_id);
@@ -152,9 +152,9 @@ class TopUpTransactionsController extends Controller
         return $transactions;
     }
 
-    function report()
+    function report(Request $request)
     {
-        $transactions = Cache::remember('transaction_history_' . Auth::id(), now()->addMinutes(10), function () {
+        $transactions = Cache::remember('transaction_history_' . Auth::id() . '_page_' . $request->query('page', 1), now()->addMinutes(10), function () {
             $transactions = TopUpTransactionsController::getReport();
 
             $json_packages = json_encode($transactions);
@@ -164,6 +164,11 @@ class TopUpTransactionsController extends Controller
         });
         $transactions = json_decode(Crypt::decryptString($transactions));
 
-        return view('report', ['transactions' => $transactions]);
+        $links = [];
+        for ($i = 1; $i <= $transactions->last_page; $i++) {
+            $links[$i] = route('report', ['page' => $i]);
+        }
+
+        return view('report', ['transactions' => $transactions->data,  'links' => $links]); 
     }
 }

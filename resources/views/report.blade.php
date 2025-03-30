@@ -8,7 +8,14 @@
     <div class="py-12">
 
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
+            <div>
+                Halaman
+                <nav id="pagination-link" class="inline-flex items-center mb-2 bg-gray-800 rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    @foreach ($links as $page_number => $link)
+                        <a href="{{ $link }}" class="px-4 py-2 rounded-md {{ request()->query('page', 1) == $page_number ? 'bg-gray-400' : 'bg-gray-800' }}">{{ $page_number }}</a>
+                    @endforeach
+                </nav>
+            </div>
             <table class="border border-gray-400">
                 <tr class="[&>th]:pl-4 [&>th]:pr-4 [&>th]:border [&>th]:border-gray-400 bg-gray-400">
                     <th>id</th>
