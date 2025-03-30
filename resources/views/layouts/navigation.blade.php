@@ -18,7 +18,7 @@
                     <x-nav-link :href="route('report')" :active="request()->routeIs('report')">
                         {{ __('Riwayat Top Up') }}
                     </x-nav-link>
-                    @if (Auth::hasUser() && Auth::user()->is_admin)
+                    @if (Auth::hasUser() && App\Models\User::find(Auth::id())->is_admin)
                         <x-nav-link :href="route('master.games')" :active="request()->routeIs('master.games')">
                             {{ __('Games') }}
                         </x-nav-link>
