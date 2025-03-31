@@ -18,14 +18,15 @@
                     <x-nav-link :href="route('report')" :active="request()->routeIs('report')">
                         {{ __('Riwayat Top Up') }}
                     </x-nav-link>
-                    @if (App\Models\User::find(Auth::id())->is_admin)
+                    
+                    @can('view-admin-nav')
                         <x-nav-link :href="route('master.games')" :active="request()->routeIs('master.games')">
                             {{ __('Games') }}
                         </x-nav-link>
                         <x-nav-link :href="route('master.packages')" :active="request()->routeIs('master.packages')">
                             {{ __('Paket Top Up') }}
                         </x-nav-link>
-                    @endif
+                    @endcan
                 </div>
             </div>
 

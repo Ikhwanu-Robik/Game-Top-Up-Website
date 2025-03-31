@@ -6,6 +6,7 @@ use App\Models\Game;
 use App\Models\TopUpPackage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Cache;
 
 class TopUpPackagesController extends Controller
@@ -28,6 +29,8 @@ class TopUpPackagesController extends Controller
 
     function index()
     {
+        Gate::authorize('view-create-package');
+
         $result_packages = TopUpPackagesController::getPackagesData();
 
         return view('master.packages', ['packages' => $result_packages, 'games' => Game::all()]);
@@ -45,12 +48,16 @@ class TopUpPackagesController extends Controller
 
     function create()
     {
+        Gate::authorize('view-create-package');
+        
         $games = Game::all();
         return view('master.create-package', ['games' => $games]);
     }
 
     function store(Request $request)
     {
+        Gate::authorize('create-package');
+
         $validated = $request->validate([
             'game_id' => 'required|exists:games,id',
             'title' => 'required',
