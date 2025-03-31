@@ -34,7 +34,7 @@
                         <td>{{ $transaction->package_title }}</td>
                         <td>{{ $transaction->package_price }}</td>
                         <td>{{ $transaction->package_items }}</td>
-                        <td>{{ Illuminate\Support\Carbon::create($transaction->created_at)->format('Y-M-d h:m:s') }}</td>
+                        <td>{{ Illuminate\Support\Carbon::create($transaction->created_at)->format('Y-m-d h:i:s') }}</td>
                         <td>{{ $transaction->method }}</td>
                         <td>{{ $transaction->status }}</td>
                     </tr>
