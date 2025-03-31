@@ -10,16 +10,12 @@ use Illuminate\Support\Facades\Cache;
 class GamesController extends Controller
 {
     function index() {
-        Gate::authorize('view-create-game');
-
         $games = Game::all();
 
         return view('master.games', ['games' => $games]);
     }
 
     function create() {
-        Gate::authorize('view-create-game');
-
         return view('master.create-game');
     }
 

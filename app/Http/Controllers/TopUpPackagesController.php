@@ -29,8 +29,6 @@ class TopUpPackagesController extends Controller
 
     function index()
     {
-        Gate::authorize('view-create-package');
-
         $result_packages = TopUpPackagesController::getPackagesData();
 
         return view('master.packages', ['packages' => $result_packages, 'games' => Game::all()]);
@@ -47,9 +45,7 @@ class TopUpPackagesController extends Controller
     }
 
     function create()
-    {
-        Gate::authorize('view-create-package');
-        
+    {   
         $games = Game::all();
         return view('master.create-package', ['games' => $games]);
     }
