@@ -14,7 +14,7 @@
                     {{ __('Ini game-game yang kami support!') }}
                 </div>
             </div>
-            <div class="m-4 flex justify-center gap-4">
+            <div class="m-4 flex flex-wrap justify-center gap-4">
                 @foreach ($games as $game)
                     <x-game-card>
                         <img src="{{ asset('storage/' . $game->icon) }}" alt="" class="w-32 h-32">

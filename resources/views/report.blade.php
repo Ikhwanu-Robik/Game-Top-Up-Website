@@ -16,8 +16,8 @@
                     @endforeach
                 </nav>
             </div>
-            <table class="border border-gray-400">
-                <tr class="[&>th]:pl-4 [&>th]:pr-4 [&>th]:border [&>th]:border-gray-400 bg-gray-400">
+            <table class="border border-gray-400z">
+                <tr class="[&>th]:pl-0 [&>th]:pr-0 [&>th]:border [&>th]:border-gray-400 bg-gray-400 text-xs md:[&>th]:px-4 md:[&>th]:py-2 md:text-base">
                     <th>id</th>
                     <th>Game</th>
                     <th>Paket</th>
@@ -28,7 +28,7 @@
                     <th>Status</th>
                 </tr>
                 @foreach ($transactions as $transaction)
-                    <tr class="[&>td]:p-4 [&>td]:border [&>td]:border-gray-300">
+                    <tr class="[&>td]:p-0 [&>td]:bg-white [&>td]:border [&>td]:border-gray-300 text-xs md:[&>td]:p-4 md:text-base">
                         <td>{{ $transaction->id }}</td>
                         <td>{{ $transaction->game_name }}</td>
                         <td>{{ $transaction->package_title }}</td>

@@ -12,7 +12,7 @@
                     {{ __('Ini game-game yang kami support!') }}
                 </div>
             </div>
-            <div class="m-4 flex justify-center gap-4">
+            <div class="m-4 flex flex-wrap justify-center gap-4">
                 @foreach ($games as $game)
                     <x-game-card>
                         <img src="{{ asset('storage/' . $game->icon) }}" alt="" class="w-32 h-32">
@@ -28,10 +28,10 @@
             <x-input-error class="mt-2" :messages="$errors->get('link_url')" />
 
             @foreach ($games as $game)
-                <div class="m-4 flex flex-col justify-center gap-4" id="{{ Str::slug($game->name) }}">
+                <div class="m-4 flex flex-wrap flex-col justify-center gap-4" id="{{ Str::slug($game->name) }}">
                     <h2 class="font-bold text-xl">Paket {{ $game->name }}</h2>
 
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2">
                         @foreach ($packages as $package)
                             @if ($package->game_id == $game->id)
                                 <x-top-up-package>

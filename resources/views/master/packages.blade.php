@@ -16,28 +16,19 @@
             </div>
             
             @foreach ($games as $game)
-                <div class="m-4 flex flex-col justify-center gap-4" id="{{ Str::slug($game->name) }}">
+                <div class="m-4 flex flex-wrap flex-col justify-center gap-4" id="{{ Str::slug($game->name) }}">
                     <h2 class="font-bold text-xl">Paket {{ $game->name }}</h2>
 
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2">
                         @foreach ($packages as $package)
                             @if ($package->game_id == $game->id)
                                 <x-top-up-package>
                                     <span class="text-xl">{{ $package->title }}</span>
                                     <span>IDR {{ $package->price }}</span>
                                     <span class="text-gray-500">{{ $package->items_count }} {{ $package->game_currency }}</span>
-                                    <form action="{{ route('transactions.store') }}" method="post">
-                                        @csrf
-                                        <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
-
-                                        <input type="hidden" name="package_id" value="{{ $package->id }}">
-
-                                        {{-- <input type="hidden" name="link_url" value="https://{{ $package->link_url }}"> --}}
-
-                                        <x-primary-button>
-                                            Beli
-                                        </x-primary-button>
-                                    </form>
+                                    <x-primary-button>
+                                        <a href="{{ route('transactions.create', ['package' => $package->id]) }}">Beli</a>
+                                    </x-primary-button>
                                 </x-top-up-package>
                             @endif
                         @endforeach

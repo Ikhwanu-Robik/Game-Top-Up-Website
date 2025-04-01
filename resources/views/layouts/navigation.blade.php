@@ -18,7 +18,7 @@
                     <x-nav-link :href="route('report')" :active="request()->routeIs('report')">
                         {{ __('Riwayat Top Up') }}
                     </x-nav-link>
-                    
+
                     @can('view-admin-nav')
                         <x-nav-link :href="route('master.games')" :active="request()->routeIs('master.games')">
                             {{ __('Games') }}
@@ -107,14 +107,19 @@
     <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
-                {{ __('home') }}
+                {{ __('Beranda') }}
             </x-responsive-nav-link>
-            <x-nav-link :href="route('master.games')" :active="request()->routeIs('master.games')">
-                {{ __('Games') }}
-            </x-nav-link>
-            <x-nav-link :href="route('master.packages')" :active="request()->routeIs('master.packages')">
-                {{ __('Paket Top Up') }}
-            </x-nav-link>
+            <x-responsive-nav-link :href="route('report')" :active="request()->routeIs('report')">
+                {{ __('Riwayat Top Up') }}
+            </x-responsive-nav-link>
+            @can('view-admin-nav')
+                <x-responsive-nav-link :href="route('master.games')" :active="request()->routeIs('master.games')">
+                    {{ __('Games') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('master.packages')" :active="request()->routeIs('master.packages')">
+                    {{ __('Paket Top Up') }}
+                </x-responsive-nav-link>
+            @endcan
         </div>
 
         <!-- Responsive Settings Options -->

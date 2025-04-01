@@ -23,7 +23,7 @@
                                 <x-input-label for="game_id" :value="__('Game')" />
                                 <select name="game_id" id="game_id">
                                     @foreach ($games as $game)
-                                        <option value="{{ $game->id }}">{{ $game->name }}</option>
+                                        <option value="{{ $game->id }}" class="text-xs md:text-base">{{ $game->name }}</option>
                                     @endforeach
                                 </select>
                                 <x-input-error class="mt-2" :messages="$errors->get('game_id')" />
